@@ -1,0 +1,402 @@
+---
+import { existsSync, readdirSync, statSync } from 'node:fs';
+import { join } from 'node:path';
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+
+const prettify = (filename: string) =>
+  filename
+    .replace(/\.[^.]+$/, '')
+    .replace(/[-_]+/g, ' ')
+    .trim();
+
+// 3D models — synced from /stl by scripts/sync-assets.mjs. Drop an .stl into the
+// repo's stl/ folder and it shows up here with a viewer and a download button.
+const modelsDir = join(process.cwd(), 'public', 'models');
+const models = existsSync(modelsDir)
+  ? readdirSync(modelsDir)
+      .filter((f) => f.toLowerCase().endsWith('.stl'))
+      .sort()
+      .map((file) => {
+        const bytes = statSync(join(modelsDir, file)).size;
+        const size =
+          bytes >= 1048576 ? `${(bytes / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+        return { file, name: prettify(file), size };
+      })
+  : [];
+
+// Gallery — synced from /images by scripts/sync-assets.mjs.
+const galleryModules = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/gallery/*.{jpg,jpeg,png,webp,gif,avif}',
+  { eager: true }
+);
+const gallery = Object.entries(galleryModules)
+  .sort(([a], [b]) => a.localeCompare(b))
+  .map(([path, mod]) => ({ src: mod.default, caption: prettify(path.split('/').pop() ?? '') }));
+const heroPhoto = gallery[0];
+
+const why = [
+  {
+    icon: '🖨️',
+    title: 'One piece, zero fuss',
+    text: 'Designed to print in a single piece on any home FDM printer. No supports to tear off, no parts to glue, no screws to lose, no electronics to wire.',
+  },
+  {
+    icon: '🎁',
+    title: 'Born to be given away',
+    text: 'Pennies in filament, a few hours on the printer, impossible not to smile at. The perfect conference give-away, workshop souvenir, and desk companion.',
+  },
+  {
+    icon: '💬',
+    title: 'A conversation starter',
+    text: '“What’s that?” — “A quantum computer.” Works on desks, in classrooms, at meetups. The physics conversation starts itself.',
+  },
+];
+
+const steps = [
+  {
+    n: '1',
+    icon: '⬇️',
+    title: 'Download',
+    text: 'Grab an STL file below — free and open source, like everything in the family.',
+  },
+  {
+    n: '2',
+    icon: '🔪',
+    title: 'Slice',
+    text: 'Any slicer, any FDM printer, PLA works great. Try 0.2 mm layers and ~15 % infill — no supports needed, Qutie prints as one piece.',
+  },
+  {
+    n: '3',
+    icon: '✨',
+    title: 'Print & enjoy',
+    text: 'A few hours later you’re holding a quantum computer. Sort of. Print one for your desk — and a few more to give away.',
+  },
+];
+
+const family = [
+  {
+    href: 'https://rasqberry.org',
+    icon: '🍓',
+    title: 'RasQberry Two',
+    text: 'The flagship: 3D-print a model of IBM Quantum System Two with a real Raspberry Pi inside, running Qiskit demos.',
+    meta: 'rasqberry.org ↗',
+  },
+  {
+    href: 'https://quantego.org',
+    icon: '🧱',
+    title: 'Quantego',
+    text: 'Quantum computers built from LEGO bricks — three models with full part lists and instructions.',
+    meta: 'quantego.org ↗',
+  },
+  {
+    href: 'https://fun-with-quantum.org',
+    icon: '🎲',
+    title: 'Fun with Quantum',
+    text: 'The family portal: quantum games you play in the browser, things to build, and hands-on ways to learn.',
+    meta: 'fun-with-quantum.org ↗',
+  },
+];
+---
+
+<Base
+  title="Qutie — a quantum computer that fits in your palm"
+  description="Cute, palm-sized models of quantum computers, 3D-printable in one piece. No electronics, no assembly. The mini RasQberry — open source, from the Fun with Quantum family."
+>
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <div class="kicker">The pocket-sized quantum computer</div>
+        <h1>A quantum computer that fits in your palm.</h1>
+        <p>
+          Qutie is the mini RasQberry: cute, palm-sized models of quantum computers that 3D-print
+          in one piece on any home printer. No electronics, no assembly, no excuses — print one,
+          put it on your desk, give one away.
+        </p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#models">⬇ Get the STL files</a>
+          <a class="btn ghost" href="https://rasqberry.org" target="_blank" rel="noopener">🍓 Meet the big sibling</a>
+        </div>
+        <div class="hero-note">prints in one piece · a few hours on any FDM printer · pocket-approved</div>
+      </div>
+      <figure class="hero-photo">
+        {heroPhoto ? (
+          <Image
+            src={heroPhoto.src}
+            alt={`${heroPhoto.caption} — a palm-sized 3D-printed quantum computer model`}
+            widths={[480, 760]}
+            sizes="(max-width: 820px) 90vw, 480px"
+          />
+        ) : (
+          <picture>
+            <source srcset="/qutie-mark-dark.svg" media="(prefers-color-scheme: dark)" />
+            <img class="hero-mark" src="/qutie-mark.svg" alt="The Qutie mark — a small tumbling die with ghost-pip eyes and a smile" width="340" height="340" />
+          </picture>
+        )}
+        <figcaption>{heroPhoto ? heroPhoto.caption : 'Qutie — too cute to decohere'}</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section" id="why">
+    <div class="wrap">
+      <div class="kicker">Why Qutie</div>
+      <h2>The smallest member of the family</h2>
+      <p class="lead">
+        RasQberry Two puts a Raspberry Pi running Qiskit inside a model of IBM Quantum System Two.
+        Quantego builds quantum computers from LEGO. Qutie asks a different question: what’s the
+        smallest object that can still start a conversation about quantum computing?
+      </p>
+      <div class="grid cols-3">
+        {why.map((w) => (
+          <div class="card">
+            <span class="icon">{w.icon}</span>
+            <h3>{w.title}</h3>
+            <p>{w.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="print">
+    <div class="wrap">
+      <div class="kicker">Print it</div>
+      <h2>From STL to desk in three steps</h2>
+      <p class="lead">
+        If your printer can print a benchy, it can print a Qutie. No special hardware, no exotic
+        filament, no post-processing.
+      </p>
+      <div class="grid cols-3">
+        {steps.map((s) => (
+          <div class="card step">
+            <span class="stepno">{s.n}</span>
+            <span class="icon">{s.icon}</span>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="models">
+    <div class="wrap">
+      <div class="kicker">Downloads</div>
+      <h2>The models</h2>
+      {models.length > 0 ? (
+        <>
+          <p class="lead">
+            Spin them around, pick a favorite, hit download. All models are open source
+            (Apache-2.0) — remix away.
+          </p>
+          <div class="grid cols-2">
+            {models.map((m) => (
+              <div class="card model">
+                <canvas class="stl-canvas" data-src={`/models/${m.file}`} aria-label={`Interactive 3D preview of ${m.name}`}></canvas>
+                <h3>{m.name}</h3>
+                <p class="meta">STL · {m.size} · drag to spin</p>
+                <a class="btn primary" href={`/models/${m.file}`} download>⬇ Download STL</a>
+              </div>
+            ))}
+          </div>
+        </>
+      ) : (
+        <div class="card soon-card">
+          <span class="icon">🚧</span>
+          <h3>The first STL files land here very soon</h3>
+          <p>
+            The models are printed, photographed, and being polished for release. Watch the
+            repository on GitHub and you’ll be notified the moment they drop — with an interactive
+            3D preview right on this page.
+          </p>
+          <a class="btn ghost" href="https://github.com/JanLahmann/Qutie" target="_blank" rel="noopener">👀 Watch on GitHub</a>
+        </div>
+      )}
+    </div>
+  </section>
+
+  {gallery.length > 0 && (
+    <section class="section" id="gallery">
+      <div class="wrap">
+        <div class="kicker">Gallery</div>
+        <h2>Quties in the wild</h2>
+        <div class="grid cols-3 gallery-grid">
+          {gallery.map((g) => (
+            <figure>
+              <Image src={g.src} alt={g.caption} widths={[420, 800]} sizes="(max-width: 820px) 90vw, 340px" />
+              <figcaption>{g.caption}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <section class="section" id="family">
+    <div class="wrap">
+      <div class="kicker">The family</div>
+      <h2>Qutie’s big siblings</h2>
+      <p class="lead">
+        Qutie is the smallest member of the Fun with Quantum family — open-source quantum outreach
+        projects built by Jan-R. Lahmann and the RasQberry community, tested on real audiences from
+        school classes to IEEE conferences.
+      </p>
+      <div class="grid cols-3">
+        {family.map((f) => (
+          <a class="card" href={f.href} target="_blank" rel="noopener">
+            <span class="icon">{f.icon}</span>
+            <h3>{f.title}</h3>
+            <p>{f.text}</p>
+            <span class="meta">{f.meta}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <div class="tagline-strip">
+    <b>GOD DOES PLAY DICE.</b> COME PLAY, BUILD, LEARN.
+  </div>
+
+  <div class="trust wrap">
+    <span>100% open source</span>
+    <span>prints in one piece</span>
+    <span>no electronics, no assembly</span>
+    <span>no accounts, no cookies</span>
+    <span>from the makers of RasQberry</span>
+  </div>
+</Base>
+
+<style>
+  .hero { padding: 56px 0 24px; }
+  .hero-grid {
+    display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 48px; align-items: center;
+  }
+  @media (max-width: 820px) { .hero-grid { grid-template-columns: 1fr; } }
+  .hero h1 { font-size: 2.5rem; margin-bottom: 18px; }
+  @media (max-width: 820px) { .hero h1 { font-size: 1.9rem; } }
+  .hero-copy p { color: var(--muted); max-width: 520px; margin-bottom: 26px; }
+  .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+  .hero-note {
+    margin-top: 14px; font-family: var(--mono); font-size: 0.72rem;
+    letter-spacing: 0.04em; color: var(--muted);
+  }
+  .hero-photo img {
+    border-radius: 16px; box-shadow: var(--shadow); width: 100%; height: auto;
+  }
+  .hero-photo img.hero-mark {
+    box-shadow: none; width: min(340px, 70%); margin: 0 auto;
+  }
+  .hero-photo figcaption {
+    margin-top: 10px; font-size: 0.8rem; color: var(--muted); text-align: center;
+  }
+
+  .card.step { position: relative; }
+  .stepno {
+    position: absolute; top: 18px; right: 22px;
+    font-family: var(--mono); font-size: 2rem; font-weight: 700;
+    background: var(--grad); -webkit-background-clip: text; background-clip: text;
+    color: transparent; opacity: 0.55; line-height: 1;
+  }
+
+  .card.model { align-items: stretch; }
+  .stl-canvas {
+    width: 100%; aspect-ratio: 4 / 3; border-radius: 10px;
+    background: radial-gradient(ellipse at 50% 40%, var(--paper), transparent 75%);
+    touch-action: pan-y; cursor: grab;
+  }
+  .card.model .btn { align-self: flex-start; }
+
+  .soon-card { max-width: 560px; }
+  .soon-card .btn { align-self: flex-start; margin-top: 6px; }
+
+  .gallery-grid figure { display: flex; flex-direction: column; }
+  .gallery-grid img {
+    border-radius: 14px; box-shadow: var(--shadow);
+    width: 100%; height: 100%; object-fit: cover; flex: 1;
+  }
+  .gallery-grid figcaption {
+    margin-top: 8px; font-size: 0.8rem; color: var(--muted); text-align: center;
+  }
+</style>
+
+<script>
+  // Interactive STL previews — loads three.js only if there are models on the page,
+  // and only once the first canvas scrolls near the viewport.
+  const canvases = Array.from(document.querySelectorAll<HTMLCanvasElement>('.stl-canvas'));
+
+  async function initViewer(canvas: HTMLCanvasElement) {
+    const [THREE, { STLLoader }, { OrbitControls }] = await Promise.all([
+      import('three'),
+      import('three/addons/loaders/STLLoader.js'),
+      import('three/addons/controls/OrbitControls.js'),
+    ]);
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(40, 4 / 3, 0.1, 2000);
+
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x50546a, 1.6));
+    const key = new THREE.DirectionalLight(0xffffff, 1.6);
+    key.position.set(1, 2, 1.5);
+    scene.add(key);
+    const fill = new THREE.DirectionalLight(0xc22f6e, 0.35);
+    fill.position.set(-1.5, -0.5, -1);
+    scene.add(fill);
+
+    const material = new THREE.MeshStandardMaterial({
+      color: 0x2fa9cc, roughness: 0.55, metalness: 0.05,
+    });
+
+    const geometry = await new STLLoader().loadAsync(canvas.dataset.src!);
+    geometry.center();
+    geometry.computeBoundingSphere();
+    const radius = geometry.boundingSphere?.radius ?? 1;
+
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.rotation.x = -Math.PI / 2; // STLs are usually Z-up; three.js is Y-up
+    scene.add(mesh);
+
+    camera.position.set(0, radius * 0.9, radius * 2.6);
+
+    const controls = new OrbitControls(camera, canvas);
+    controls.enablePan = false;
+    controls.enableZoom = false;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 2.2;
+    controls.enableDamping = true;
+
+    const resize = () => {
+      const { clientWidth, clientHeight } = canvas;
+      if (clientWidth === 0) return;
+      renderer.setSize(clientWidth, clientHeight, false);
+      camera.aspect = clientWidth / clientHeight;
+      camera.updateProjectionMatrix();
+    };
+    resize();
+    new ResizeObserver(resize).observe(canvas);
+
+    renderer.setAnimationLoop(() => {
+      controls.update();
+      renderer.render(scene, camera);
+    });
+  }
+
+  if (canvases.length > 0) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            io.unobserve(entry.target);
+            initViewer(entry.target as HTMLCanvasElement);
+          }
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    canvases.forEach((c) => io.observe(c));
+  }
+</script>

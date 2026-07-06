@@ -1,0 +1,22 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="404 — Qutie" description="This page collapsed to the wrong state.">
+  <section class="section">
+    <div class="wrap notfound">
+      <div class="kicker">Measurement error</div>
+      <h2>This page collapsed to |404⟩</h2>
+      <p>
+        We measured, and the page you were looking for wasn’t the outcome. Happens to the best
+        superpositions.
+      </p>
+      <a class="btn primary" href="/">↩ Back to |home⟩</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .notfound { padding: 48px 24px 96px; }
+  .notfound p { color: var(--muted); max-width: 480px; margin: 12px 0 28px; }
+</style>

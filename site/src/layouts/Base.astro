@@ -1,0 +1,85 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const nav = [
+  { href: '/#why', label: 'Why Qutie' },
+  { href: '/#print', label: 'Print it' },
+  { href: '/#models', label: 'Downloads' },
+  { href: '/#family', label: 'Family' },
+];
+const path = Astro.url.pathname;
+const family = [
+  { href: 'https://fun-with-quantum.org', label: 'Fun with Quantum' },
+  { href: 'https://rasqberry.org', label: 'RasQberry Two' },
+  { href: 'https://rasqberry.one', label: 'RasQberry One' },
+  { href: 'https://quantego.org', label: 'Quantego' },
+  { href: 'https://qoffee-maker.org', label: 'Qoffee-Maker' },
+];
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={new URL(path, Astro.site)} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={new URL(path, Astro.site)} />
+    <meta name="twitter:card" content="summary" />
+    {/* Umami analytics (cookieless) — uncomment once the qutie.org website is
+        created in the Umami Cloud dashboard and the ID is known:
+    <script defer src="https://cloud.umami.is/script.js" data-website-id="REPLACE-WITH-WEBSITE-ID"></script>
+    */}
+  </head>
+  <body>
+    <header>
+      <div class="wrap nav">
+        <a class="brand" href="/">
+          <picture>
+            <source srcset="/qutie-mark-dark.svg" media="(prefers-color-scheme: dark)" />
+            <img src="/qutie-mark.svg" alt="" width="34" height="34" />
+          </picture>
+          <span>Qutie</span>
+        </a>
+        {nav.map((item) => (
+          <a class="item" href={item.href}>
+            {item.label}
+          </a>
+        ))}
+        <a class="ext" href="https://github.com/JanLahmann/Qutie" target="_blank" rel="noopener">GitHub ↗</a>
+      </div>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <div class="tag">GOD DOES PLAY DICE. COME PLAY, BUILD, LEARN.</div>
+        <div class="family">
+          <strong>Part of the Fun with Quantum family:</strong>
+          {family.map((s) => <a href={s.href} target="_blank" rel="noopener">{s.label}</a>)}
+        </div>
+        <div>
+          Open source, built by <a href="https://www.linkedin.com/in/JanLahmann" target="_blank" rel="noopener">Jan-R. Lahmann</a> and the
+          RasQberry community. No accounts, no cookies.
+        </div>
+        <div class="fineprint">
+          <a href="https://github.com/JanLahmann/Qutie" target="_blank" rel="noopener">Source on GitHub</a>{' '}·{' '}<a href="https://quantego.biz" target="_blank" rel="noopener">Shop</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
