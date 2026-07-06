@@ -16,12 +16,13 @@ const prettify = (filename: string) =>
     .trim();
 
 // Realistic materials for the 3D previews, matched by model name.
-const looks: { match: RegExp; color: string; metalness: number; roughness: number }[] = [
-  { match: /one/i, color: '#26272d', metalness: 0.15, roughness: 0.45 }, // System One — black enclosure
-  { match: /two/i, color: '#c7ccd6', metalness: 0.45, roughness: 0.35 }, // System Two — silver cryostat
+const looks: { match: RegExp; color: string; metalness: number; roughness: number; rotate: number }[] = [
+  // System One — black enclosure; starts 180° around so the open front faces the viewer
+  { match: /one/i, color: '#26272d', metalness: 0.15, roughness: 0.45, rotate: 180 },
+  { match: /two/i, color: '#c7ccd6', metalness: 0.45, roughness: 0.35, rotate: 0 }, // System Two — silver cryostat
 ];
 const lookFor = (name: string) =>
-  looks.find((l) => l.match.test(name)) ?? { color: '#2fa9cc', metalness: 0.05, roughness: 0.55 };
+  looks.find((l) => l.match.test(name)) ?? { color: '#2fa9cc', metalness: 0.05, roughness: 0.55, rotate: 0 };
 
 // 3D models — synced from /stl by scripts/sync-assets.mjs. Drop an .stl into the
 // repo's stl/ folder and it shows up here on the showroom stage.
@@ -127,7 +128,7 @@ const family = [
   {firstModel ? (
     <section class="stage-section" id="models">
       <div class="wrap">
-        <div class="kicker">The pocket-sized quantum computer showroom</div>
+        <div class="kicker">The pocket-sized quantum computer</div>
         <div class="stage-grid">
           <div class="stage">
             <canvas id="stage-canvas" aria-label={`Interactive 3D preview of ${firstModel.name}`}></canvas>
@@ -158,6 +159,7 @@ const family = [
                   data-color={m.look.color}
                   data-metalness={m.look.metalness}
                   data-roughness={m.look.roughness}
+                  data-rotate={m.look.rotate}
                 >
                   {m.name.replace(/^Qutie\s+/i, '')}
                 </button>
@@ -419,6 +421,7 @@ const family = [
         })
       );
       mesh.rotation.x = -Math.PI / 2; // STLs are usually Z-up; three.js is Y-up
+      mesh.rotation.z = (Number(data.rotate ?? 0) * Math.PI) / 180; // per-model start angle
       scene.add(mesh);
       camera.position.set(0, radius * 0.9, radius * 2.6);
       controls.target.set(0, 0, 0);
