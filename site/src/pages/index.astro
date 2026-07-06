@@ -208,6 +208,23 @@ const family = [
     </div>
   </section>
 
+  {gallery.length > 0 && (
+    <section class="section" id="gallery">
+      <div class="wrap">
+        <div class="kicker">Gallery</div>
+        <h2>Quties in the wild</h2>
+        <div class="grid cols-3 gallery-grid">
+          {gallery.map((g) => (
+            <figure>
+              <Image src={g.src} alt={g.caption} widths={[420, 800]} sizes="(max-width: 820px) 90vw, 340px" />
+              <figcaption>{g.caption}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
   <section class="section" id="print">
     <div class="wrap">
       <div class="kicker">Print it</div>
@@ -228,23 +245,6 @@ const family = [
       </div>
     </div>
   </section>
-
-  {gallery.length > 0 && (
-    <section class="section" id="gallery">
-      <div class="wrap">
-        <div class="kicker">Gallery</div>
-        <h2>Quties in the wild</h2>
-        <div class="grid cols-3 gallery-grid">
-          {gallery.map((g) => (
-            <figure>
-              <Image src={g.src} alt={g.caption} widths={[420, 800]} sizes="(max-width: 820px) 90vw, 340px" />
-              <figcaption>{g.caption}</figcaption>
-            </figure>
-          ))}
-        </div>
-      </div>
-    </section>
-  )}
 
   <section class="section" id="family">
     <div class="wrap">
