@@ -9,3 +9,6 @@ The filename becomes the caption: `Qutie-on-a-desk.jpg` shows up as **“Qutie o
 A picture with **`hero`** in its filename (e.g. `Qutie One and Two - hero.jpeg`) is used as
 the big photo at the top of the page; the word “hero” never appears in the caption. Without
 one, the first picture (alphabetically) is used.
+
+License: [Apache-2.0](../LICENSE) or [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/),
+whichever suits you.

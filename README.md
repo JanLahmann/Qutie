@@ -39,7 +39,18 @@ button, and adds every picture to the gallery. Filenames become captions
 | [Quantego](https://quantego.org) | Quantum computers built from LEGO bricks |
 | [Qoffee-Maker](https://qoffee-maker.org) | Order coffee with a quantum circuit |
 
-Open source ([Apache-2.0](./LICENSE)), built by
-[Jan-R. Lahmann](https://www.linkedin.com/in/JanLahmann) and the RasQberry community.
+## License
+
+The repository is licensed under [Apache-2.0](./LICENSE). The 3D models in [`stl/`](./stl) and
+the photos in [`images/`](./images) are additionally available under
+[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) — use whichever of the two
+licenses suits you.
+
+Qutie is an independent educational project and is not affiliated with, endorsed by, or
+sponsored by IBM Corporation. IBM®, IBM Quantum®, Qiskit®, IBM Quantum System One and IBM
+Quantum System Two are trademarks of International Business Machines Corporation. This project
+creates educational models inspired by IBM's quantum computing systems for teaching purposes.
+
+Built by [Jan-R. Lahmann](https://www.linkedin.com/in/JanLahmann) and the RasQberry community.
 
 *GOD DOES PLAY DICE. COME PLAY, BUILD, LEARN.*
