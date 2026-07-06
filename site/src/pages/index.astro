@@ -4,14 +4,24 @@ import { join } from 'node:path';
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 
-// "Qutie System One v06.stl" -> "Qutie System One", "Qutie Two - 01.jpeg" -> "Qutie Two"
+// "Qutie System One v06.stl" -> "Qutie System One", "Qutie Two - 01.jpeg" -> "Qutie Two",
+// "Qutie One and Two - hero.jpeg" -> "Qutie One and Two" ("hero" marks the main picture)
 const prettify = (filename: string) =>
   filename
     .replace(/\.[^.]+$/, '')
     .replace(/[-_]+/g, ' ')
+    .replace(/\bhero\b/gi, '')
     .replace(/\s+v?\d+$/i, '')
     .replace(/\s+/g, ' ')
     .trim();
+
+// Realistic materials for the 3D previews, matched by model name.
+const looks: { match: RegExp; color: string; metalness: number; roughness: number }[] = [
+  { match: /one/i, color: '#26272d', metalness: 0.15, roughness: 0.45 }, // System One — black enclosure
+  { match: /two/i, color: '#c7ccd6', metalness: 0.45, roughness: 0.35 }, // System Two — silver cryostat
+];
+const lookFor = (name: string) =>
+  looks.find((l) => l.match.test(name)) ?? { color: '#2fa9cc', metalness: 0.05, roughness: 0.55 };
 
 // 3D models — synced from /stl by scripts/sync-assets.mjs. Drop an .stl into the
 // repo's stl/ folder and it shows up here with a viewer and a download button.
@@ -24,7 +34,8 @@ const models = existsSync(modelsDir)
         const bytes = statSync(join(modelsDir, file)).size;
         const size =
           bytes >= 1048576 ? `${(bytes / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
-        return { url: `/models/${encodeURIComponent(file)}`, name: prettify(file), size };
+        const name = prettify(file);
+        return { url: `/models/${encodeURIComponent(file)}`, name, size, look: lookFor(name) };
       })
   : [];
 
@@ -35,8 +46,13 @@ const galleryModules = import.meta.glob<{ default: ImageMetadata }>(
 );
 const gallery = Object.entries(galleryModules)
   .sort(([a], [b]) => a.localeCompare(b))
-  .map(([path, mod]) => ({ src: mod.default, caption: prettify(path.split('/').pop() ?? '') }));
-const heroPhoto = gallery[0];
+  .map(([path, mod]) => ({
+    file: path.split('/').pop() ?? '',
+    src: mod.default,
+    caption: prettify(path.split('/').pop() ?? ''),
+  }));
+// An image with "hero" in its filename becomes the main picture; falls back to the first one.
+const heroPhoto = gallery.find((g) => /hero/i.test(g.file)) ?? gallery[0];
 
 const why = [
   {
@@ -197,7 +213,14 @@ const family = [
           <div class="grid cols-2">
             {models.map((m) => (
               <div class="card model">
-                <canvas class="stl-canvas" data-src={m.url} aria-label={`Interactive 3D preview of ${m.name}`}></canvas>
+                <canvas
+                  class="stl-canvas"
+                  data-src={m.url}
+                  data-color={m.look.color}
+                  data-metalness={m.look.metalness}
+                  data-roughness={m.look.roughness}
+                  aria-label={`Interactive 3D preview of ${m.name}`}
+                ></canvas>
                 <h3>{m.name}</h3>
                 <p class="meta">STL · {m.size} · drag to spin</p>
                 <a class="btn primary" href={m.url} download>⬇ Download STL</a>
@@ -315,10 +338,10 @@ const family = [
   .soon-card { max-width: 560px; }
   .soon-card .btn { align-self: flex-start; margin-top: 6px; }
 
-  .gallery-grid figure { display: flex; flex-direction: column; }
+  .gallery-grid { align-items: start; }
   .gallery-grid img {
     border-radius: 14px; box-shadow: var(--shadow);
-    width: 100%; height: 100%; object-fit: cover; flex: 1;
+    width: 100%; height: auto;
   }
   .gallery-grid figcaption {
     margin-top: 8px; font-size: 0.8rem; color: var(--muted); text-align: center;
@@ -343,16 +366,21 @@ const family = [
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(40, 4 / 3, 0.1, 2000);
 
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x50546a, 1.6));
-    const key = new THREE.DirectionalLight(0xffffff, 1.6);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x50546a, 1.8));
+    const key = new THREE.DirectionalLight(0xffffff, 2.0);
     key.position.set(1, 2, 1.5);
     scene.add(key);
-    const fill = new THREE.DirectionalLight(0xc22f6e, 0.35);
-    fill.position.set(-1.5, -0.5, -1);
+    const rim = new THREE.DirectionalLight(0xffffff, 1.1);
+    rim.position.set(-1.5, 0.8, -1.5);
+    scene.add(rim);
+    const fill = new THREE.DirectionalLight(0xc22f6e, 0.12);
+    fill.position.set(-1.5, -0.5, 1);
     scene.add(fill);
 
     const material = new THREE.MeshStandardMaterial({
-      color: 0x2fa9cc, roughness: 0.55, metalness: 0.05,
+      color: new THREE.Color(canvas.dataset.color || '#2fa9cc'),
+      roughness: Number(canvas.dataset.roughness ?? 0.55),
+      metalness: Number(canvas.dataset.metalness ?? 0.05),
     });
 
     const geometry = await new STLLoader().loadAsync(canvas.dataset.src!);
