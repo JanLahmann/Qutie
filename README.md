@@ -29,18 +29,6 @@ The deploy workflow copies them into the site, lists every model with a 3D viewe
 button, and adds every picture to the gallery. Filenames become captions
 (`Qutie-System-Two.stl` → “Qutie System Two”), so name files accordingly.
 
-## Developing the website
-
-```bash
-cd site
-npm install
-npm run dev      # local preview at localhost:4321
-npm run build    # production build (also syncs stl/ and images/ into the site)
-```
-
-The design follows the shared [Fun with Quantum brand](https://github.com/JanLahmann/Fun-with-Quantum/tree/master/brand)
-— same palette, typography, and footer as fun-with-quantum.org and its siblings.
-
 ## The family
 
 | Project | What it is |
