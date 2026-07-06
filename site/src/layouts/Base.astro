@@ -4,9 +4,10 @@ import '../styles/global.css';
 interface Props {
   title: string;
   description: string;
+  ogImage?: string;
 }
 
-const { title, description } = Astro.props;
+const { title, description, ogImage } = Astro.props;
 const nav = [
   { href: '/#why', label: 'Why Qutie' },
   { href: '/#print', label: 'Print it' },
@@ -36,7 +37,8 @@ const family = [
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:url" content={new URL(path, Astro.site)} />
-    <meta name="twitter:card" content="summary" />
+    {ogImage && <meta property="og:image" content={new URL(ogImage, Astro.site)} />}
+    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
     {/* Umami analytics (cookieless) — uncomment once the qutie.org website is
         created in the Umami Cloud dashboard and the ID is known:
     <script defer src="https://cloud.umami.is/script.js" data-website-id="REPLACE-WITH-WEBSITE-ID"></script>

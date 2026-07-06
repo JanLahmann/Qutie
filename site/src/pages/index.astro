@@ -4,10 +4,13 @@ import { join } from 'node:path';
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 
+// "Qutie System One v06.stl" -> "Qutie System One", "Qutie Two - 01.jpeg" -> "Qutie Two"
 const prettify = (filename: string) =>
   filename
     .replace(/\.[^.]+$/, '')
     .replace(/[-_]+/g, ' ')
+    .replace(/\s+v?\d+$/i, '')
+    .replace(/\s+/g, ' ')
     .trim();
 
 // 3D models — synced from /stl by scripts/sync-assets.mjs. Drop an .stl into the
@@ -21,7 +24,7 @@ const models = existsSync(modelsDir)
         const bytes = statSync(join(modelsDir, file)).size;
         const size =
           bytes >= 1048576 ? `${(bytes / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
-        return { file, name: prettify(file), size };
+        return { url: `/models/${encodeURIComponent(file)}`, name: prettify(file), size };
       })
   : [];
 
@@ -102,6 +105,7 @@ const family = [
 <Base
   title="Qutie — a quantum computer that fits in your palm"
   description="Cute, palm-sized models of quantum computers, 3D-printable in one piece. No electronics, no assembly. The mini RasQberry — open source, from the Fun with Quantum family."
+  ogImage={heroPhoto?.src.src}
 >
   <section class="hero">
     <div class="wrap hero-grid">
@@ -193,10 +197,10 @@ const family = [
           <div class="grid cols-2">
             {models.map((m) => (
               <div class="card model">
-                <canvas class="stl-canvas" data-src={`/models/${m.file}`} aria-label={`Interactive 3D preview of ${m.name}`}></canvas>
+                <canvas class="stl-canvas" data-src={m.url} aria-label={`Interactive 3D preview of ${m.name}`}></canvas>
                 <h3>{m.name}</h3>
                 <p class="meta">STL · {m.size} · drag to spin</p>
-                <a class="btn primary" href={`/models/${m.file}`} download>⬇ Download STL</a>
+                <a class="btn primary" href={m.url} download>⬇ Download STL</a>
               </div>
             ))}
           </div>
