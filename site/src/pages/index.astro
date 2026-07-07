@@ -1,7 +1,7 @@
 ---
 import { existsSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import rasqberryPic from '../assets/family/rasqberry-two.png';
 import quantegoPic from '../assets/family/quantego.jpg';
@@ -59,6 +59,11 @@ const gallery = Object.entries(galleryModules)
   }));
 // An image with "hero" in its filename becomes the lead picture; falls back to the first one.
 const heroPhoto = gallery.find((g) => /hero/i.test(g.file)) ?? gallery[0];
+// Social-media preview: a resized jpeg of the hero — full-size originals are too heavy
+// for link previews (WhatsApp drops images over ~600 KB).
+const ogImage = heroPhoto
+  ? (await getImage({ src: heroPhoto.src, width: 1200, format: 'jpeg' })).src
+  : undefined;
 
 const why = [
   {
@@ -135,7 +140,7 @@ const family = [
 <Base
   title="Qutie — a quantum computer that fits in your palm"
   description="Cute, palm-sized models of quantum computers, 3D-printable in one piece. No electronics, no assembly. The mini RasQberry — open source, from the Fun with Quantum family."
-  ogImage={heroPhoto?.src.src}
+  ogImage={ogImage}
 >
   {firstModel ? (
     <section class="stage-section" id="models">
