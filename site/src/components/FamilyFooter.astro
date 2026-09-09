@@ -12,7 +12,12 @@ const links = footerLinks(family, SELF_ID);
 <div class="tag">{family.brand.tagline.l}</div>
 <div class="family">
   <strong>{family.brand.footer_lead}</strong>
-  {links.map((s) => <a href={s.url} target="_blank" rel="noopener">{s.name}</a>)}
+  {links.map((s) => (
+    <a class="member" href={s.url} target="_blank" rel="noopener">
+      <span>{s.name}</span>
+      {s.short && <small>{s.short}</small>}
+    </a>
+  ))}
 </div>
 <div>
   Open source, built by <a href={family.brand.credit_url} target="_blank" rel="noopener">Jan-R. Lahmann</a> and the
