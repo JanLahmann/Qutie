@@ -4,11 +4,12 @@
  * Source of truth: family/family.json in JanLahmann/Fun-with-Quantum. At build time we fetch the
  * live manifest so a roster change reaches this site on the next build (Fun-with-Quantum fires a
  * repository_dispatch at this repo when it changes). If the fetch fails — offline dev, GitHub
- * hiccup — we fall back to the vendored copy in ./family.json so the build never breaks.
+ * hiccup — we fall back to the vendored copy in ./fwq-family.json so the build never breaks
+ * (that copy is refreshed by an automated PR from Fun-with-Quantum whenever the roster changes).
  *
  * Override with FWQ_FAMILY_URL (custom source) or FWQ_FAMILY_OFFLINE=1 (vendored copy only).
  */
-import vendored from './family.json';
+import vendored from './fwq-family.json';
 
 export interface FamilyMember {
   id: string;
@@ -54,7 +55,9 @@ export function loadFamily(): Promise<FamilyManifest> {
 async function load(): Promise<FamilyManifest> {
   const fallback = vendored as FamilyManifest;
   if (process.env.FWQ_FAMILY_OFFLINE === '1') return fallback;
-  const url = process.env.FWQ_FAMILY_URL ?? DEFAULT_URL;
+  // raw.githubusercontent.com is CDN-cached for ~5 minutes; a unique query string busts it so a
+  // dispatch-triggered rebuild always sees the manifest that triggered it.
+  const url = process.env.FWQ_FAMILY_URL ?? `${DEFAULT_URL}?t=${Date.now()}`;
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
