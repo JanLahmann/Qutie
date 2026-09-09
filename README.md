@@ -43,7 +43,7 @@ sponsored by IBM Corporation. IBM®, IBM Quantum®, Qiskit®, IBM Quantum System
 Quantum System Two are trademarks of International Business Machines Corporation. This project
 creates educational models inspired by IBM's quantum computing systems for teaching purposes.
 
-<!-- FWQ-FAMILY:START format=table — generated from family.json, do not edit by hand -->
+<!-- FWQ-FAMILY:START format=table — generated from family.json in JanLahmann/Fun-with-Quantum, do not edit by hand -->
 ## Part of the Fun with Quantum family
 
 This project is part of [**Fun with Quantum**](https://fun-with-quantum.org), a family of open-source quantum outreach projects.
