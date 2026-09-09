@@ -9,6 +9,9 @@ on:
       - 'images/**'
       - '.github/workflows/deploy-site.yml'
   workflow_dispatch:
+  # Fired by JanLahmann/Fun-with-Quantum when family/family.json changes → family footer re-renders.
+  repository_dispatch:
+    types: [family-updated]
 
 permissions:
   contents: read
