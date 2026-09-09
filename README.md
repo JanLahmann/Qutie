@@ -43,7 +43,10 @@ sponsored by IBM Corporation. IBM®, IBM Quantum®, Qiskit®, IBM Quantum System
 Quantum System Two are trademarks of International Business Machines Corporation. This project
 creates educational models inspired by IBM's quantum computing systems for teaching purposes.
 
-## The family
+<!-- FWQ-FAMILY:START format=table — generated from family.json, do not edit by hand -->
+## Part of the Fun with Quantum family
+
+This project is part of [**Fun with Quantum**](https://fun-with-quantum.org), a family of open-source quantum outreach projects.
 
 | Project | What it is |
 |---|---|
@@ -52,6 +55,13 @@ creates educational models inspired by IBM's quantum computing systems for teach
 | [RasQberry One](https://rasqberry.one) | The original — functional model of IBM Q System One |
 | [Quantego](https://quantego.org) | Quantum computers built from LEGO bricks |
 | [Qoffee-Maker](https://qoffee-maker.org) | Order coffee with a quantum circuit |
+| [Entangible](https://entangible.org) | Physical quantum circuit composer for booths and classrooms |
+| [CertiQ](https://certiq.dev) | Machine-verified prep for the IBM Qiskit developer certification |
+| [QuBins](https://qubins.org) | Prebuilt Qiskit environments — one click in Binder or docker pull |
+| [QAMPoser](https://qamposer.org) | Web-based quantum circuit composer |
+
+*God does play dice. Come play, build, learn.*
+<!-- FWQ-FAMILY:END -->
 
 ---
 
