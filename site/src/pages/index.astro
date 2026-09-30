@@ -165,7 +165,7 @@ const family = [
               </figure>
             )}
             <a class="btn primary sm" id="model-download" href={firstModel.url} download
-               data-umami-event="download" data-umami-event-kind="stl" data-umami-event-file={firstModel.name}>⬇ Download STL</a>
+               data-umami-event="Qutie: STL download" data-umami-event-file={firstModel.name}>⬇ Download STL</a>
             <div class="chips" role="group" aria-label="Choose a model">
               {models.map((m, i) => (
                 <button
@@ -483,7 +483,7 @@ const family = [
         nameEl.textContent = chip.dataset.name!;
         metaEl.textContent = `STL · ${chip.dataset.size} · prints in one piece`;
         downloadEl.href = chip.dataset.src!;
-        downloadEl.dataset.umamiEventFile = chip.dataset.name!; // keeps the Umami `download` event's file property in step
+        downloadEl.dataset.umamiEventFile = chip.dataset.name!; // keeps the Umami `Qutie: STL download` event's file property in step
         canvas!.setAttribute('aria-label', `Interactive 3D preview of ${chip.dataset.name}`);
         show(chip.dataset);
       })
