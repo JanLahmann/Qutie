@@ -58,6 +58,7 @@ This project is part of [**Fun with Quantum**](https://fun-with-quantum.org), a 
 | [Entangible](https://entangible.org) | Physical quantum circuit composer for booths and classrooms |
 | [CertiQ](https://certiq.dev) | Machine-verified prep for the IBM Qiskit developer certification |
 | [QuBins](https://qubins.org) | Prebuilt Qiskit environments — one click in Binder or docker pull |
+| [doQumentation](https://doqumentation.org) | Qiskit documentation — executable and multilingual |
 | [QAMPoser](https://qamposer.org) | Web-based quantum circuit composer |
 
 *God does play dice. Come play, build, learn.*
