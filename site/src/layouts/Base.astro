@@ -6,9 +6,10 @@ interface Props {
   title: string;
   description: string;
   ogImage?: string;
+  jsonLd?: object;
 }
 
-const { title, description, ogImage } = Astro.props;
+const { title, description, ogImage, jsonLd } = Astro.props;
 const nav = [
   { href: '/#models', label: 'The models' },
   { href: '/#why', label: 'Why Qutie' },
@@ -33,6 +34,8 @@ const path = Astro.url.pathname;
     <meta property="og:url" content={new URL(path, Astro.site)} />
     {ogImage && <meta property="og:image" content={new URL(ogImage, Astro.site)} />}
     <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+    {/* Structured data for search engines; "<" escaped so the JSON can't close the script tag */}
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd).replace(/</g, '\\u003c')} />}
     {/* Umami analytics (cookieless, shared Fun with Quantum family property) */}
     <script
       defer
