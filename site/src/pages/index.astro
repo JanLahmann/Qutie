@@ -65,6 +65,41 @@ const ogImage = heroPhoto
   ? (await getImage({ src: heroPhoto.src, width: 1200, format: 'jpeg' })).src
   : undefined;
 
+// Structured data (schema.org): the site, plus one 3DModel per STL on the stage.
+const site = Astro.site!;
+const licenses = ['https://www.apache.org/licenses/LICENSE-2.0', 'https://creativecommons.org/licenses/by-sa/4.0/'];
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': new URL('/#website', site).href,
+      name: 'Qutie',
+      url: site.href,
+      inLanguage: 'en',
+      isPartOf: { '@type': 'WebSite', name: 'Fun with Quantum', url: 'https://fun-with-quantum.org' },
+    },
+    ...models.map((m) => ({
+      '@type': '3DModel',
+      name: m.name,
+      description: `${m.name}: a palm-sized model of a quantum computer, 3D-printable in one piece on any home FDM printer.`,
+      url: new URL('/#models', site).href,
+      ...(ogImage && { image: new URL(ogImage, site).href }),
+      encoding: {
+        '@type': 'MediaObject',
+        contentUrl: new URL(m.url, site).href,
+        encodingFormat: 'model/stl',
+        contentSize: m.size,
+      },
+      license: licenses,
+      isAccessibleForFree: true,
+      isFamilyFriendly: true,
+      keywords: '3D printing, STL, quantum computer, model, education',
+      isPartOf: { '@id': new URL('/#website', site).href },
+    })),
+  ],
+};
+
 const why = [
   {
     icon: '🖨️',
@@ -141,6 +176,7 @@ const family = [
   title="Qutie — a quantum computer that fits in your palm"
   description="Cute, palm-sized models of quantum computers, 3D-printable in one piece. No electronics, no assembly. The mini RasQberry — open source, from the Fun with Quantum family."
   ogImage={ogImage}
+  jsonLd={jsonLd}
 >
   {firstModel ? (
     <section class="stage-section" id="models">
