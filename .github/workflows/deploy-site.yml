@@ -44,3 +44,14 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+
+  # Tell Bing, Yandex & co. which pages changed (the family's reusable IndexNow job; it sends the
+  # sitemap pages whose <lastmod> is today or yesterday). The key is public by design and is served
+  # from site/public/105279401a1460fadec1cb5bb559807d.txt.
+  indexnow:
+    needs: deploy
+    if: github.ref == 'refs/heads/main'
+    uses: JanLahmann/Fun-with-Quantum/.github/workflows/indexnow.yml@master
+    with:
+      site: https://qutie.org
+      key: 105279401a1460fadec1cb5bb559807d
