@@ -33,12 +33,16 @@ const path = Astro.url.pathname;
     <meta property="og:url" content={new URL(path, Astro.site)} />
     {ogImage && <meta property="og:image" content={new URL(ogImage, Astro.site)} />}
     <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
-    {/* Umami analytics (cookieless, shared Fun with Quantum family property) */}
+    {/* Umami analytics (cookieless, shared Fun with Quantum family property) — the family's
+        standard snippet: ?notrack / ?track switch tracking off / on for this browser, and
+        bots, headless browsers and Lighthouse runs send nothing */}
+    <script is:inline>(function(){try{var q=location.search;if(/[?&]notrack\b/.test(q))localStorage.setItem('umami.disabled','1');if(/[?&]track\b/.test(q))localStorage.removeItem('umami.disabled')}catch(e){}window.fwqUmamiBeforeSend=function(t,p){var n=navigator;return(n.webdriver||/HeadlessChrome|bot|crawl|spider|Lighthouse|PageSpeed/i.test(n.userAgent))?false:p}})();</script>
     <script
       defer
       src="https://cloud.umami.is/script.js"
       data-website-id="97f347ac-e7ba-4be3-b26f-ab4b328bdbf2"
-      data-domains="qutie.org"></script>
+      data-domains="qutie.org"
+      data-before-send="fwqUmamiBeforeSend"></script>
   </head>
   <body>
     <header>
@@ -78,5 +82,15 @@ const path = Astro.url.pathname;
         </div>
       </div>
     </footer>
+    <script>
+      // Every external link without an event of its own reports "Qutie: outbound click" with
+      // its host (the shop and the family footer keep their own events).
+      for (const a of document.querySelectorAll<HTMLAnchorElement>('a[href^="http"]:not([data-umami-event])')) {
+        const host = new URL(a.href).hostname;
+        if (host === location.hostname) continue;
+        a.dataset.umamiEvent = 'Qutie: outbound click';
+        a.dataset.umamiEventHost = host;
+      }
+    </script>
   </body>
 </html>
