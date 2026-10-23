@@ -167,6 +167,9 @@ footer .family .member small { display: block; font-size: 0.76rem; color: var(--
 footer .tag { font-family: var(--mono); font-size: 0.72rem; letter-spacing: 0.16em; }
 footer .fineprint { margin-top: 18px; font-size: 0.78rem; }
 footer .fineprint a { color: var(--muted); }
+/* links inside a sentence (credit line, fineprint): underlined, not just colored, and in the
+   footer's muted text color — the light cyan is 4.47:1 on paper, just under 4.5:1 */
+footer a:not(.member) { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 
 /* ---------- prose (markdown bodies) ---------- */
 .prose { max-width: 680px; }
