@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Qutie System One - parametric model (build123d).
 
-Rebuild of `stl/Qutie System One v06.stl` (Tinkercad, design RasQberry
+Rebuild of `originals/Qutie System One v06.stl` (Tinkercad, design RasQberry
 mini v06): a C-shaped frame (base, back wall, roof) with the cryostat
 hanging from the roof.
 
@@ -88,7 +88,7 @@ def build(p=PARAMS):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--outdir", default=str(HERE / "output"))
+    ap.add_argument("--outdir", default=str(HERE.parent / "print"))
     a = ap.parse_args()
     parts = build()
     report(parts)

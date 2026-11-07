@@ -11,5 +11,5 @@ site/src/assets/gallery/
 .DS_Store
 
 # generated STEP files (large; run cad/qutie_*.py)
-cad/output/*.step
+print/*.step
 __pycache__/

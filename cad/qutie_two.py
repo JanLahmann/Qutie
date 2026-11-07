@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Qutie System Two - parametric model (build123d).
 
-Rebuild of `stl/Qutie System Two v02.stl` (Tinkercad, design RQB2-mini-v02):
+Rebuild of `originals/Qutie System Two v02.stl` (Tinkercad, design RQB2-mini-v02):
 a palm-sized RasQberry Two on a 50 x 60 mm floor plate.
 
 Parts and print colours (one body per colour in the 3MF):
@@ -185,7 +185,7 @@ def build(p=PARAMS):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--outdir", default=str(HERE / "output"))
+    ap.add_argument("--outdir", default=str(HERE.parent / "print"))
     a = ap.parse_args()
     parts = build()
     report(parts)

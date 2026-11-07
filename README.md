@@ -11,7 +11,8 @@ conversations with.
 
 ## Get one
 
-1. **Download** an STL file from [`/stl`](./stl) (or from [qutie.org](https://qutie.org), with an interactive 3D preview).
+1. **Download** a model from [`print/`](./print) (or from [qutie.org](https://qutie.org), with an interactive 3D preview):
+   the STL for one colour, or the 3MF for a multi-colour print (each part already named after its filament).
 2. **Slice** it with your favorite slicer. PLA works great. Suggested starting points:
    0.2 mm layers, ~15 % infill, no supports — Qutie is designed to print as one piece.
 3. **Print.** A few hours later you're holding a quantum computer. Sort of.
@@ -20,18 +21,20 @@ conversations with.
 
 | Path | What it is |
 |---|---|
-| [`stl/`](./stl) | The 3D-printable models (STL). **Drop new `.stl` files here** — the website picks them up automatically. |
+| [`print/`](./print) | The 3D-printable models: STL (one colour) and 3MF (in colour). The website lists every STL here, with the 3MF of the same name as a second download. |
+| [`originals/`](./originals) | The original Tinkercad designs (STL), kept for reference. |
+| [`cad/`](./cad) | The models as code (build123d); they generate `print/`. |
 | [`images/`](./images) | Photos of printed Quties. **Drop new pictures here** — the website gallery picks them up automatically. |
 | [`site/`](./site) | The [qutie.org](https://qutie.org) website (Astro). Deployed to GitHub Pages on every push to `main`. |
 
-Adding a model or photo is a one-step job: commit the file into `stl/` or `images/` and push.
+Adding a model or photo is a one-step job: commit the file into `print/` or `images/` and push.
 The deploy workflow copies them into the site, lists every model with a 3D viewer and download
 button, and adds every picture to the gallery. Filenames become captions
 (`Qutie-System-Two.stl` → “Qutie System Two”), so name files accordingly.
 
 ## License
 
-The repository is licensed under [Apache-2.0](./LICENSE). The 3D models in [`stl/`](./stl) and
+The repository is licensed under [Apache-2.0](./LICENSE). The 3D models in [`print/`](./print) and
 the photos in [`images/`](./images) are additionally available under
 [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) — use whichever of the two
 licenses suits you.

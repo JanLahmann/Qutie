@@ -1,7 +1,7 @@
 // Copies the canonical maker assets from the repo root into the site:
-//   /stl/*.stl        -> site/public/models/     (served as direct downloads + 3D viewer)
+//   /print/*.{stl,3mf} -> site/public/models/    (direct downloads; the STL also feeds the 3D viewer)
 //   /images/*.{jpg..} -> site/src/assets/gallery/ (optimized by astro:assets)
-// Both targets are gitignored — /stl and /images are the single source of truth.
+// Both targets are gitignored — /print and /images are the single source of truth.
 // Runs automatically before `npm run dev` and `npm run build`.
 
 import { copyFileSync, existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
@@ -14,9 +14,9 @@ const repoDir = join(siteDir, '..');
 const jobs = [
   {
     label: 'models',
-    from: join(repoDir, 'stl'),
+    from: join(repoDir, 'print'),
     to: join(siteDir, 'public', 'models'),
-    exts: ['.stl'],
+    exts: ['.stl', '.3mf'],
   },
   {
     label: 'gallery',

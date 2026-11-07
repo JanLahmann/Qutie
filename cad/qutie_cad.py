@@ -39,16 +39,16 @@ def engrave_bottom(body, polys, depth):
 def export(name, parts, colours, outdir):
     """parts: {part: shape}; colours: {part: (filament name, (r, g, b, a))}.
     Writes
-        <name>.stl / .step      one piece (all parts fused), single colour
-        <name>.3mf              one coloured body per part
-        <name> - <part>.stl     one STL per part (for slicers that assign
-                                filaments per object)"""
+        <name>.stl / .step            one piece (all parts fused), single colour
+        <name>.3mf                    one coloured body per part
+        parts/<name> - <part>.stl     one STL per part (for slicers that
+                                      assign filaments per object)"""
     outdir = Path(outdir)
-    outdir.mkdir(parents=True, exist_ok=True)
+    (outdir / "parts").mkdir(parents=True, exist_ok=True)
     whole = None
     for part, shape in parts.items():
         whole = shape if whole is None else whole + shape
-        export_stl(shape, str(outdir / f"{name} - {part}.stl"), tolerance=TOL,
+        export_stl(shape, str(outdir / "parts" / f"{name} - {part}.stl"), tolerance=TOL,
                    angular_tolerance=ANG_TOL)
     whole = whole.clean()
     export_stl(whole, str(outdir / f"{name}.stl"), tolerance=TOL, angular_tolerance=ANG_TOL)

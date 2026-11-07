@@ -16,12 +16,12 @@ System Two (two_outlines.json)
          stored as (x, z))
   chandelier  the two free-form outlines (stem, six-armed column) of the
          RasQberry chandelier at full size, copied from RasQberry-Two
-         (`3D Model/parametric/cryostat/cryo_profiles.json`, branch
+         (`3D Model/cad/cryostat/cryo_profiles.json`, branch
          3D-model-parametric); qutie_two.py scales it down
 
 Usage:
-    python3 extract_outlines.py one "../stl/Qutie System One v06.stl"
-    python3 extract_outlines.py two "../stl/Qutie System Two v02.stl" <path to cryo_profiles.json>
+    python3 extract_outlines.py one "../originals/Qutie System One v06.stl"
+    python3 extract_outlines.py two "../originals/Qutie System Two v02.stl" <path to cryo_profiles.json>
 """
 import json
 import sys

@@ -28,8 +28,9 @@ const looks: { match: RegExp; color: string; metalness: number; roughness: numbe
 const lookFor = (name: string) =>
   looks.find((l) => l.match.test(name)) ?? { color: '#2fa9cc', metalness: 0.05, roughness: 0.55, rotate: 0 };
 
-// 3D models — synced from /stl by scripts/sync-assets.mjs. Drop an .stl into the
-// repo's stl/ folder and it shows up here on the showroom stage.
+// 3D models — synced from /print by scripts/sync-assets.mjs. Drop an .stl into the
+// repo's print/ folder and it shows up here on the showroom stage; a .3mf with the
+// same name (the colour version) gets its own download button.
 const modelsDir = join(process.cwd(), 'public', 'models');
 const models = existsSync(modelsDir)
   ? readdirSync(modelsDir)
@@ -40,7 +41,9 @@ const models = existsSync(modelsDir)
         const size =
           bytes >= 1048576 ? `${(bytes / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
         const name = prettify(file);
-        return { url: `/models/${encodeURIComponent(file)}`, name, size, look: lookFor(name) };
+        const file3mf = file.replace(/\.stl$/i, '.3mf');
+        const url3mf = existsSync(join(modelsDir, file3mf)) ? `/models/${encodeURIComponent(file3mf)}` : '';
+        return { url: `/models/${encodeURIComponent(file)}`, url3mf, name, size, look: lookFor(name) };
       })
   : [];
 const firstModel = models[0];
@@ -202,12 +205,16 @@ const family = [
             )}
             <a class="btn primary sm" id="model-download" href={firstModel.url} download
                data-umami-event="Qutie: STL download" data-umami-event-file={firstModel.name}>⬇ Download STL</a>
+            <a class="btn ghost sm" id="model-download-3mf" href={firstModel.url3mf || undefined} download
+               hidden={!firstModel.url3mf}
+               data-umami-event="Qutie: 3MF download" data-umami-event-file={firstModel.name}>⬇ 3MF in colour</a>
             <div class="chips" role="group" aria-label="Choose a model">
               {models.map((m, i) => (
                 <button
                   class="chip"
                   aria-pressed={i === 0 ? 'true' : 'false'}
                   data-src={m.url}
+                  data-src3mf={m.url3mf}
                   data-name={m.name}
                   data-size={m.size}
                   data-color={m.look.color}
@@ -376,6 +383,7 @@ const family = [
     width: 100%; height: auto; border-radius: 12px; box-shadow: var(--shadow);
   }
   .btn.sm { padding: 9px 16px; font-size: 0.88rem; }
+  .btn[hidden] { display: none; }
   .model-name { font-size: 1.9rem; }
   .stage-panel .meta {
     font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.06em; color: var(--muted);
@@ -512,6 +520,7 @@ const family = [
     const nameEl = document.getElementById('model-name')!;
     const metaEl = document.getElementById('model-meta')!;
     const downloadEl = document.getElementById('model-download') as HTMLAnchorElement;
+    const download3mfEl = document.getElementById('model-download-3mf') as HTMLAnchorElement;
 
     chips.forEach((chip) =>
       chip.addEventListener('click', () => {
@@ -520,6 +529,9 @@ const family = [
         metaEl.textContent = `STL · ${chip.dataset.size} · prints in one piece`;
         downloadEl.href = chip.dataset.src!;
         downloadEl.dataset.umamiEventFile = chip.dataset.name!; // keeps the Umami `Qutie: STL download` event's file property in step
+        download3mfEl.hidden = !chip.dataset.src3mf;
+        if (chip.dataset.src3mf) download3mfEl.href = chip.dataset.src3mf;
+        download3mfEl.dataset.umamiEventFile = chip.dataset.name!;
         canvas!.setAttribute('aria-label', `Interactive 3D preview of ${chip.dataset.name}`);
         show(chip.dataset);
       })
