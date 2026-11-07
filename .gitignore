@@ -9,3 +9,7 @@ site/src/assets/gallery/
 
 # OS
 .DS_Store
+
+# generated STEP files (large; run cad/qutie_*.py)
+cad/output/*.step
+__pycache__/
