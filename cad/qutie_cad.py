@@ -1,10 +1,9 @@
 """Shared helpers for the Qutie models (build123d). All dimensions in mm."""
-import re
 import zipfile
 from pathlib import Path
+from xml.sax.saxutils import quoteattr
 
-from build123d import (Color, Face, Mesher, Plane, Polygon, Wire, export_step,
-                       export_stl, extrude)
+from build123d import Face, Plane, Polygon, Wire, export_step, export_stl, extrude
 
 # Mesh export: linear tolerance (mm) and angular tolerance (rad)
 TOL, ANG_TOL = 0.005, 0.2
@@ -53,31 +52,82 @@ def export(name, parts, colours, outdir):
     whole = whole.clean()
     export_stl(whole, str(outdir / f"{name}.stl"), tolerance=TOL, angular_tolerance=ANG_TOL)
     export_step(whole, str(outdir / f"{name}.step"))
-    m = Mesher()
-    for part, shape in parts.items():
-        for i, solid in enumerate(shape.solids()):
-            solid.color = Color(*colours[part][1])
-            solid.label = part if i == 0 else f"{part} {i + 1}"
-            m.add_shape(solid, linear_deflection=TOL, angular_deflection=ANG_TOL,
-                        part_number=solid.label)
-    path = outdir / f"{name}.3mf"
-    m.write(str(path))
-    _name_materials(path, [colours[p][0] for p, s in parts.items() for _ in s.solids()])
+    bodies = [(f"{part} {i + 1}" if i else part, *colours[part], mesh(solid))
+              for part, shape in parts.items() for i, solid in enumerate(shape.solids())]
+    write_3mf(outdir / f"{name}.3mf", name, bodies)
     return whole
 
 
-def _name_materials(path, names):
-    """Give the 3MF materials the filament names (build123d writes
-    'Color: (r, g, b, a) near ...'); the slicer shows these names."""
-    with zipfile.ZipFile(path) as z:
-        files = {n: z.read(n) for n in z.namelist()}
-    model = files["3D/3dmodel.model"].decode()
-    it = iter(names)
-    model = re.sub(r'(<base name=")Color: [^"]*(")', lambda m: m.group(1) + next(it) + m.group(2), model)
-    files["3D/3dmodel.model"] = model.encode()
+def mesh(shape):
+    """(vertices, triangles) of a shape, with the vertices on shared edges
+    merged so the mesh is closed."""
+    verts, tris = shape.tessellate(TOL, ANG_TOL)
+    index, out, remap = {}, [], []
+    for v in verts:
+        key = (round(v.X, 5), round(v.Y, 5), round(v.Z, 5))
+        if key not in index:
+            index[key] = len(out)
+            out.append((v.X, v.Y, v.Z))
+        remap.append(index[key])
+    faces = [tuple(remap[i] for i in t) for t in tris]
+    return out, [f for f in faces if len(set(f)) == 3]
+
+
+def write_3mf(path, name, bodies):
+    """3MF with ONE object made of the bodies [(label, filament, rgba, mesh)].
+
+    Each body is a named part with its filament as material (name + display
+    colour) and, for PrusaSlicer / Bambu Studio / OrcaSlicer, its own
+    extruder (Metadata/Slic3r_PE_model.config; filaments numbered in order of
+    first use). Plain 3MF readers see one multi-colour mesh."""
+    filaments = list(dict.fromkeys(b[1] for b in bodies))
+    rgba = {b[1]: b[2] for b in bodies}
+
+    def hexcol(c):
+        return "#" + "".join(f"{round(v * 255):02X}" for v in c)
+
+    out = ['<?xml version="1.0" encoding="UTF-8"?>',
+           '<model unit="millimeter" xml:lang="en-US" '
+           'xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" '
+           'xmlns:slic3rpe="http://schemas.slic3r.org/3mf/2017/06">',
+           '<metadata name="slic3rpe:Version3mf">1</metadata>',
+           '<resources>', '<basematerials id="1">']
+    out += [f'<base name={quoteattr(f)} displaycolor="{hexcol(rgba[f])}"/>' for f in filaments]
+    out += ['</basematerials>', f'<object id="2" type="model" name={quoteattr(name)} pid="1" '
+            'pindex="0"><mesh><vertices>']
+    for *_, (verts, _) in bodies:
+        out += [f'<vertex x="{x:.4f}" y="{y:.4f}" z="{z:.4f}"/>' for x, y, z in verts]
+    out.append('</vertices><triangles>')
+    config = ['<?xml version="1.0" encoding="UTF-8"?>', '<config>',
+              '<object id="2" instances_count="1">',
+              f'<metadata type="object" key="name" value={quoteattr(name)}/>']
+    base = first = 0
+    for label, filament, _, (verts, tris) in bodies:
+        k = filaments.index(filament)
+        out += [f'<triangle v1="{a + base}" v2="{b + base}" v3="{c + base}" pid="1" p1="{k}"/>'
+                for a, b, c in tris]
+        config += [f'<volume firstid="{first}" lastid="{first + len(tris) - 1}">',
+                   f'<metadata type="volume" key="name" value={quoteattr(label + " - " + filament)}/>',
+                   f'<metadata type="volume" key="extruder" value="{k + 1}"/>', '</volume>']
+        base += len(verts)
+        first += len(tris)
+    config += ['</object>', '</config>']
+    out += ['</triangles></mesh></object>', '</resources>',
+            '<build><item objectid="2"/></build>', '</model>']
+    types = ('<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/'
+             'package/2006/content-types"><Default Extension="rels" ContentType="application/'
+             'vnd.openxmlformats-package.relationships+xml"/><Default Extension="model" '
+             'ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/>'
+             '<Default Extension="config" ContentType="text/xml"/></Types>')
+    rels = ('<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.'
+            'openxmlformats.org/package/2006/relationships"><Relationship Target="/3D/'
+            '3dmodel.model" Id="rel0" Type="http://schemas.microsoft.com/3dmanufacturing/'
+            '2013/01/3dmodel"/></Relationships>')
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as z:
-        for n, data in files.items():
-            z.writestr(n, data)
+        z.writestr("[Content_Types].xml", types)
+        z.writestr("_rels/.rels", rels)
+        z.writestr("3D/3dmodel.model", "\n".join(out))
+        z.writestr("Metadata/Slic3r_PE_model.config", "\n".join(config))
 
 
 def report(parts):

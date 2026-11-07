@@ -10,9 +10,10 @@ can be changed by editing numbers, and printed in colour.
 
 Each script writes to `../print/`:
 
-- `<model>.3mf` — one body per colour, each named after its filament.
-  PrusaSlicer, Bambu Studio and OrcaSlicer import it as several objects
-  (or one object with several parts); assign a filament to each.
+- `<model>.3mf` — one object with a part per colour, each named after its
+  filament and set to its own extruder (PrusaSlicer's 3MF metadata, also
+  read by Bambu Studio and OrcaSlicer). Checked in PrusaSlicer 2.9:
+  manifold, slices without conflicts.
 - `parts/<model> - <part>.stl` — the same parts as separate STLs.
 - `<model>.stl` — all parts fused, for a single-colour print (the shape of
   the original in `originals/`).
