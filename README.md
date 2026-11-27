@@ -15,7 +15,7 @@ conversations with.
    the STL for one colour, or the 3MF for a multi-colour print (each part already named after its filament).
 2. **Slice** it with your favorite slicer. PLA works great. Suggested starting points:
    0.2 mm layers, ~15 % infill, no supports — Qutie is designed to print as one piece.
-3. **Print.** Soon you're holding a quantum computer. Sort of.
+3. **Print.** Then you're holding a quantum computer. Sort of.
 
 ## Repository layout
 
